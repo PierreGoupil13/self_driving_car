@@ -12,8 +12,18 @@ class Car{
         this.angle=0;
         this.damaged=false;
 
-        if(controlType!="DUMMY"){
+        this.useBrain = controlType === "AI";
+
+        if(controlType!=="DUMMY"){
             this.sensor=new Sensor(this);
+            this.brain = new NeuralNetwork(
+                /*
+                    Le premier layer à autant de neurones que de rayons
+                    Le second c'est comme on veut
+                    Le dernier correspond à nos 4 controles possibles
+                 */
+                [this.sensor.rayCount,6,4]
+            );
         }
         this.controls=new Controls(controlType);
     }
@@ -26,6 +36,19 @@ class Car{
         }
         if(this.sensor){
             this.sensor.update(roadBorders,traffic);
+            const offsets = this.sensor.readings.map(
+                // L'idée est que plus l'objet est proche plus la valeur
+                // de retour est grande.
+                s => s === null ? 0 : 1-s.offset
+            );
+            const outputs = NeuralNetwork.feedForward(offsets, this.brain)
+
+            if (this.useBrain) {
+                this.controls.forward=outputs[0]
+                this.controls.left=outputs[1]
+                this.controls.right=outputs[2]
+                this.controls.reverse=outputs[3]
+            }
         }
     }
 
@@ -91,7 +114,7 @@ class Car{
             this.speed=0;
         }
 
-        if(this.speed!=0){
+        if(this.speed!==0){
             const flip=this.speed>0?1:-1;
             // C'est une sorte de cercle de trigo mais inversé, donc - pour la droite et + pour la gauche
             // borne droite -pi/2 borne gauche cest +pi/2
