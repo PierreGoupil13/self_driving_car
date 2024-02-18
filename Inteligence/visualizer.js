@@ -19,7 +19,7 @@ class Visualizer{
                 lerp(
                     height-levelHeight,
                     0,
-                    network.levels.length==1
+                    network.levels.length===1
                         ?0.5
                         :i/(network.levels.length-1)
                 );
@@ -28,7 +28,7 @@ class Visualizer{
             Visualizer.drawLevel(ctx,network.levels[i],
                 left,levelTop,
                 width,levelHeight,
-                i==network.levels.length-1
+                i===network.levels.length-1
                     ?['&#8599;','🠈','🠊','🠋']
                     :[]
             );
@@ -108,7 +108,7 @@ class Visualizer{
         return lerp(
             left,
             right,
-            nodes.length==1
+            nodes.length===1
                 ?0.5
                 :index/(nodes.length-1)
         );
